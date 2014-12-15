@@ -42,12 +42,12 @@ class beamq:
 		
 		self.q = q
 		self.wavelength = wavelength
-		self.waistSize = 0
-		self.waistZ = 0
-		self.divergenceAngle = 0
-		self.radiusOfCurvature = 0
-		self.beamWidth = 0
-		self.rayleighRange = 0
+		self.waistSize = 0.
+		self.waistZ = 0.
+		self.divergenceAngle = 0.
+		self.radiusOfCurvature = 0.
+		self.beamWidth = 0.
+		self.rayleighRange = 0.
 	
 
 
@@ -154,4 +154,106 @@ class beamq:
 		self.wavelength = qin.wavelength
 		self.waistSize = np.sqrt((qin.q.imag)*self.wavelength/np.pi)
 
-	return self.waistSize
+		return self.waistSize
+
+
+
+	def get_rayleighRange (self, qin): # not sure
+		# self.w0 = qin.waistSize
+		self.w0 = qin.get_waistSize(qin)
+		self.wavelength = qin.wavelength
+
+		self.rayleighRange = np.pi*self.w0**2/self.wavelength
+
+		return self.rayleighRange
+
+	# ???why dont use imag part of q directly??? if so
+
+
+
+	def get_divergenceAngle (self, qin):
+		self.w0 = qin.get_waistSize(qin)
+		self.zR = qin.get_rayleighRange(qin)
+
+		self.divergenceAngle = self.w0/self.zR
+
+		return self.divergenceAngle
+
+
+
+	def get_waistZ (self, qin):
+
+		self.waistZ = qin.q.real
+
+		return self.waistZ
+
+
+
+	def get_beamWidth (self, qin):
+
+		self.z = qin.get_waistZ(qin)
+		self.zR = qin.get_rayleighRange(qin)
+		self.w0 = qin.get_waistSize(qin)
+
+		self.beamwidth = self.w0*np.sqrt(1+(self.z/self.zR)**2)
+
+		return self.beamWidth
+
+
+
+	def get_radiusOfCurvature (self, qin):
+
+		self.z = qin.get_waistZ(qin)
+		self.zR = qin.get_rayleighRange(qin)
+
+		if z != 0:
+			self.radiusOfCurvature = self.z*(1+(self.zR/self.z)**2)
+
+		else:
+			self.radiusOfCurvature = np.inf
+
+		return self.radiusOfCurvature
+
+
+
+	# methods for making useful calculations
+
+	def overlap (self, beam1, beam2):
+	
+	# -- beamq.overlap --
+    # Find the overlap fraction of 2 beams (assumes axial symmetry).
+
+    self.q1 = beam1.q
+    self.q2 = beam2.q
+
+    self.w1 = beam1.get_waistZ(beam1)
+    self.w2 = beam2.get_waistZ(beam2)
+
+    self.wavelength = beam1.wavelength
+
+    if self.wavelength != beam2.wavelength:
+    	raise Exception ("Cannot overlap beams of different wavelength.")
+
+    else:
+    	return (2*np.pi/self.wavelength*self.w1*self.w2*1/abs(self.q2.conjugate()-self.q1))**2
+		# square for 2D modematching
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
