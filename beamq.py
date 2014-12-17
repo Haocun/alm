@@ -221,21 +221,21 @@ class beamq:
 	def overlap (self, beam1, beam2):
 	
 		# -- beamq.overlap --
-    	# Find the overlap fraction of 2 beams (assumes axial symmetry).
+    		# Find the overlap fraction of 2 beams (assumes axial symmetry).
 
-    	self.q1 = beam1.q
+    		self.q1 = beam1.q
    	 	self.q2 = beam2.q
 
-    	self.w1 = beam1.get_waistZ(beam1)
-    	self.w2 = beam2.get_waistZ(beam2)
+    		self.w1 = beam1.get_waistZ(beam1)
+    		self.w2 = beam2.get_waistZ(beam2)
 
-    	self.wavelength = beam1.wavelength
+    		self.wavelength = beam1.wavelength
 
-    	if self.wavelength != beam2.wavelength:
-    		raise Exception ("Cannot overlap beams of different wavelength.")
+	    	if self.wavelength != beam2.wavelength:
+    			raise Exception ("Cannot overlap beams of different wavelength.")
 
-    	else:
-    		return (2*np.pi/self.wavelength*self.w1*self.w2*1/abs(self.q2.conjugate()-self.q1))**2
+	    	else:
+    			return (2*np.pi/self.wavelength*self.w1*self.w2*1/abs(self.q2.conjugate()-self.q1))**2
 			# square for 2D modematching
 
 
@@ -243,30 +243,30 @@ class beamq:
 	def transform (self, beamin, M = np.matrix ('1,0;0,1')):
 
 		# -- beamq.transform --
-        # Creates a new beamq object after being transformed by an ABCD matrix.
-        # Example:
-        # newbeam = oldbeam.transform(oldbeam, M)
-        # This transforms the oldbeam object and placed the new object into
-        # newbeam, using the ABCD matrix M.
+	        # Creates a new beamq object after being transformed by an ABCD matrix.
+        	# Example:
+        	# newbeam = oldbeam.transform(oldbeam, M)
+        	# This transforms the oldbeam object and placed the new object into
+        	# newbeam, using the ABCD matrix M.
 
-        self.qin = beamin.q
-        self.M = M
+	        self.qin = beamin.q
+        	self.M = M
 
-        self.qout = beamin.transformValue (self.qin, self.M)
+        	self.qout = beamin.transformValue (self.qin, self.M)
 
-        self.beamout = beamin.duplicate(beamin)
-        self.beamout.q = self.qout
+	        self.beamout = beamin.duplicate(beamin)
+        	self.beamout.q = self.qout
 
-        return self 
+        	return self 
 
 
-    # plotting
+        # plotting
 
-    #def plotBeamWidth (self, qarray, zdomain, varargin):
+        # def plotBeamWidth (self, qarray, zdomain, varargin):
 
-    	# -- beamq.plotBeamWidth --
-        # Given an array of beamq objects, this function will plot 
-        # the beam width.
+	     	# -- beamq.plotBeamWidth --
+	        # Given an array of beamq objects, this function will plot 
+	        # the beam width.
     
 
 
