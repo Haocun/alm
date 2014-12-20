@@ -270,39 +270,12 @@ class beamq:
         # the beamwidth.
 
         self.zdomain = zdomain
-        self.beamWidtharray = []
-
-        for q in qarray:
-            self.beamWidtharray.append(q. get_beamWidth (q))
-
-        self.ploth = plt.plot(self.zdomain, self.beamWidtharray)
-        #plt.plot(zdomain, beamWidtharray)
+        
+        self.ploth = plt.plot(self.zdomain, [q.get_beamWidth(q) for q in qarray], *args)
+        plt.plot(self.zdomain, [-q.get_beamWidth(q) for q in qarray], *args)
 
         plt.show()
 
         self.plothandle = self.ploth
 
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   
