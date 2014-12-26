@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 class beamq:
     
-    '''
+    """
     -- beamq --
     
         The beamq class is used for calculating the properties of a 
@@ -37,7 +37,7 @@ class beamq:
                 phase front of the beam.
             rayleighRange - The axial length scale of the beam focus,
                 this is also the imaginary part of the q parameter.
-    '''
+    """
     
     def __init__ (self, q, wavelength = 1064e-9):
         
