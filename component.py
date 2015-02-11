@@ -34,7 +34,8 @@ class component:
         self.z = z
 
 
-    def lens (self, focalLength, Z = 0, label = 0):
+    @staticmethod
+    def lens (focalLength, Z = 0, label = 0):
 
         #   -- component.lens --
         # Create a lens component object.
@@ -43,39 +44,33 @@ class component:
         # This creates a lens component with focal length f at position
         # z. label is a string which is used to identify the component.
 
-        self.focalLength = focalLength
-        self.Z = Z
-        self.label = label
+        numcomps = len(focalLength)
 
-        self.numcomps = len(self.focalLength)
+        if numcomps > 1:
+            zlength = len(Z)
 
-        if self.numcomps > 1:
-            self.zlength = len(Z)
-
-            if self.zlength != self.numcomps:
-                if self.zlength != 1:
+            if zlength != numcomps:
+                if zlength != 1:
                     raise Exception ("List of focal lengths must be the\
-                                    same length as list of z positions.")
-                else:
-                    self.Z = self.Z[0:self.numcomps]
+                                    same length as list of z positions.")                
+                Z = Z[0:numcomps]
 
-            if self.label != 0:
-                self.lablength = len(self.label)
+            if label != 0:
+                lablength = len(label)
 
-                if isinstance(self.label, str):
-                    self.lablength = 1
+                if isinstance(label, str):
+                    lablength = 1
 
-                if self.lablength != self.numcomps:
-                    if self.zlength != 1:
+                if lablength != numcomps:
+                    if zlength != 1:
                         raise Exception ("List of focal lengths must be the\
                                         same length as list of labels.") 
                     
-                    else:
-                        self.singlabel = self.label
-                        self.label = []
+                    singlabel = label
+                    label = []
 
-                        for jj in xrange(1,self.numcomps+1):
-                            self.label.append(self.singlabel)
+                    for jj in xrange(1,numcomps+1):
+                        label.append(singlabel)
 
 #line77
 
@@ -94,22 +89,5 @@ class component:
 
 
 
-
-
-
-
-    def flatMirror (self, Z = 0, label):
-
-        #   -- component.flatMirror --
-        # Create a flat Mirror component object.
-        # Example:
-        # component.flatMirror(z,label);
-        # This creates a flat mirror component at position z.
-        # Label is a string which is used to identify the component.
-
-        self.M = [ 1, 0; 0, 1];
-        
-        self.type = 'flat mirror'
-        self.label = label
 
 
