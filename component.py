@@ -28,14 +28,14 @@ class component:
 
     # these methods are to construct different types of components
 
-    def __init__ (self, label = "none", z = 0):
+    def __init__ (self, label = ['none'], z = [0]):
 
         self.label = label
         self.z = z
 
 
     @staticmethod
-    def lens (focalLength, Z = 0, label = 0):
+    def lens (focalLength = [0], Z = [0], label = ['none']):
 
         #   -- component.lens --
         # Create a lens component object.
@@ -53,33 +53,28 @@ class component:
                 if zlength != 1:
                     raise Exception ("List of focal lengths must be the\
                                     same length as list of z positions.")                
-                Z = Z[0:numcomps]
+                Z = Z*numcomps
 
-            if label != 0:
+            if label != ['none']:
                 lablength = len(label)
 
-                if isinstance(label, str):
-                    lablength = 1
-
                 if lablength != numcomps:
-                    if zlength != 1:
+                    if lablength != 1:
                         raise Exception ("List of focal lengths must be the\
                                         same length as list of labels.") 
-                    
-                    singlabel = label
-                    label = []
+                    label = label*numcomps
 
-                    for jj in xrange(1,numcomps+1):
-                        label.append(singlabel)
+        lenslist = []
+        for n in range(numcomps):
+            if label != ['none']:
+                lenslist.append([focalLength[n],Z[n],label[n]])
+            else:
+                lenslist.append([focalLength[n],Z[n]])
 
-#line77
+        return lenslist
 
-
-
-
-
-
-
+        M = np.matrix ('1,0;-1/focalLength,1')
+        
 
 
 
@@ -87,7 +82,35 @@ class component:
 
 
 
+#map matlab arrayfun
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    @staticmethod
+    def flatMirror (self, Z = 0, label):
+
+        #   -- component.flatMirror --
+        # Create a flat Mirror component object.
+        # Example:
+        # component.flatMirror(z,label);
+        # This creates a flat mirror component at position z.
+        # Label is a string which is used to identify the component.
+
+        M = [ 1, 0; 0, 1];
+        
+        type = 'flat mirror'
+        label = label
+        return component(M, Z)
 
 
