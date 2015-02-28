@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.lib.recfunctions as nprf
 
 class component:
     
@@ -28,14 +29,15 @@ class component:
 
     # these methods are to construct different types of components
 
-    def __init__ (self, label = ['none'], z = [0]):
+    def __init__ (self, M = None, z = [0]):
 
-        self.label = label
         self.z = z
+        self.type = 'other'
+        self.parameters = [0]
 
 
     @staticmethod
-    def lens (focalLength = [0], Z = [0], label = ['none']):
+    def lens (focalLength = [0], Z = [0], label = None):
 
         #   -- component.lens --
         # Create a lens component object.
@@ -55,7 +57,7 @@ class component:
                                     same length as list of z positions.")                
                 Z = Z*numcomps
 
-            if label != ['none']:
+            if label is not None:
                 lablength = len(label)
 
                 if lablength != numcomps:
@@ -64,53 +66,31 @@ class component:
                                         same length as list of labels.") 
                     label = label*numcomps
 
-        lenslist = []
-        for n in range(numcomps):
-            if label != ['none']:
-                lenslist.append([focalLength[n],Z[n],label[n]])
-            else:
-                lenslist.append([focalLength[n],Z[n]])
-
-        return lenslist
-
-        M = np.matrix ('1,0;-1/focalLength,1')
-        
+            lenslist = [[0,0,0]] # make the count start from 1
+            for n in range(numcomps):
+                c = component()
+                if label is not None:
+                    cl = c.lens([focalLength[n]],[Z[n]],[label[n]])
+                else:
+                    cl = c.lens([focalLength[n]],[Z[n]])
+                lenslist.append(cl)
+            return lenslist 
 
 
+        fl = focalLength[0]
+        M = np.matrix('1,0;-1/fl,1')        
 
-
-
-
-
-#map matlab arrayfun
-
-
-
-
-
+        o = component(M, Z)
+        o.type = 'lens'
+        o.parameters = nprf.rec_append_fields(o.parameters,'focalLength',[fl],dtypes = [(float)])
+        if label is not None:
+            o.label = label[0]
+        else:
+            o.label = 'no label'
+        return o
 
 
 
-
-
-
-
-
-
-    @staticmethod
-    def flatMirror (self, Z = 0, label):
-
-        #   -- component.flatMirror --
-        # Create a flat Mirror component object.
-        # Example:
-        # component.flatMirror(z,label);
-        # This creates a flat mirror component at position z.
-        # Label is a string which is used to identify the component.
-
-        M = [ 1, 0; 0, 1];
-        
-        type = 'flat mirror'
-        label = label
-        return component(M, Z)
-
-
+#Example:
+#A = component.lens([1,3],[4,5],['lb1','lb2'])
+#print (A[1].type, A[1].parameters.focalLength, A[1].label)
