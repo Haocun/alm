@@ -78,7 +78,7 @@ class component:
 
 
         fl = focalLength[0]
-        M = np.matrix('1,0;-1/fl,1')        
+        M = np.matrix('1, 0; -1/fl, 1')        
 
         o = component(M, Z)
         o.type = 'lens'
@@ -90,7 +90,91 @@ class component:
         return o
 
 
-
 #Example:
 #A = component.lens([1,3],[4,5],['lb1','lb2'])
 #print (A[1].type, A[1].parameters.focalLength, A[1].label)
+
+
+    @staticmethod
+    def curvedMirror (radiusOfCurvature = [0], Z = [0], label = None):
+
+        # -- component.curvedMirror --
+        # Create a curved mirror component object.
+        # Example:
+        # mylens = component.curvedMirror(ROC,z,label);
+        # This creates a lens component with radius of curvature ROC at position
+        # z. label is a string which is used to identify the component.
+
+        numcomps = len(radiusOfCurvature)
+
+        if numcomps > 1:
+            zlength = len(Z)
+
+            if zlength != numcomps:
+                if zlength != 1:
+                    raise Exception ("List of radii must be the\
+                                    same length as list of z positions.")                
+                Z = Z*numcomps
+
+            if label is not None:
+                lablength = len(label)
+
+                if lablength != numcomps:
+                    if lablength != 1:
+                        raise Exception ("List of radii must be the\
+                                        same length as list of labels.") 
+                    label = label*numcomps
+
+            curvedMirrorlist = [[0,0,0]] # make the count start from 1
+            for n in range(numcomps):
+                c = component()
+                if label is not None:
+                    ccm = c.curvedMirror([radiusOfCurvature[n]],[Z[n]],[label[n]])
+                else:
+                    ccm = c.curvedMirror([radiusOfCurvature[n]],[Z[n]])
+                curvedMirrorlist.append(ccm)
+            return curvedMirrorlist
+
+
+        radii = radiusOfCurvature[0]
+        M = np.matrix('1, 0; -2/radii, 1')        
+
+        o = component(M, Z)
+        o.type = 'curved mirror'
+        o.parameters = nprf.rec_append_fields(o.parameters,'ROC',[radii],dtypes = [(float)])
+        if label is not None:
+            o.label = label[0]
+        else:
+            o.label = 'no label'
+        return o
+
+
+#Example:
+#B = component.curvedMirror([10,20],[40,60],['cM1','cM2'])
+#print (B[2].type, B[1].parameters.ROC, B[1].label)
+
+
+    @staticmethod
+    def flatMirror (Z = [0], label = None):
+
+        #   -- component.flatMirror --
+        # Create a flat Mirror component object.
+        # There can only be one flat mirror in an optical path.
+        # Example:
+        # component.flatMirror(z,label);
+        # This creates a flat mirror component at position z.
+        # Label is a string which is used to identify the component.
+
+        M = np.matrix('1, 0; 0, 1') 
+        
+        o = component(M, Z)
+        o.type = 'flat mirror'
+        if label is not None:
+            o.label = label
+        else:
+            o.label = 'no label'
+        return o
+ 
+#Example:
+#C = component.flatMirror([60],'fm1')
+#print (C.type, C.z, C.label)
