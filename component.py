@@ -80,8 +80,9 @@ class component:
                 lenslist.append(cl)
             return lenslist 
 
-
-        M = np.matrix([[1,0],[-1/focalLength[0],1]])        
+        
+        fl = -1/focalLength[0]
+        M = np.matrix([[1,0],[fl,1]])        
 
         o = component(M, Z)
         o.type = 'lens'
@@ -138,8 +139,8 @@ class component:
                 curvedMirrorlist.append(ccm)
             return curvedMirrorlist
 
-
-        M = np.matrix([[1,0],[-2/radiusOfCurvature[0],1]])        
+        radii = radiusOfCurvature[0]
+        M = np.matrix([[1,0],[-2/radii,1]])        
 
         o = component(M, Z)
         o.type = 'curved mirror'
@@ -232,6 +233,50 @@ class component:
         return o
 
 #Example:
-E = component.propagator(0.5, 2, 'prop1')
-print (E.type, E.parameters.length, E.label)
+#E = component.propagator(0.5, 2, 'prop1')
+#print (E.type, E.parameters.length, E.label)
+
+
+#    def duplicate(self):
+#
+#        # -- component.duplicate --
+#        # make a new component (or array of components) with the
+#        # same properties as the original.
+#        # Example:
+#        # lens1copy = lens1.duplicate;
+
+
+    def combine(self, componentTrain):
+
+        # -- component.combine --
+        # Squashes a list of components together to make a single component
+        # with transfer matrix equal to the product of the list, multiplied
+        # in order of index array.
+
+        Mtrain = np.matrix([[1,0],[0,1]])
+
+        for j in range(len(componentTrain)):
+            Mtrain = componentTrain[j].M * Mtrain
+        
+        cT = component(Mtrain, 0)
+        cT.type = 'composite'
+        return cT
+
+#Example:
+#A = component.lens([2],[0.2],['lb1'])
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#E = component.propagator(0.5, 2, 'prop1')
+#F = component.lens([3],[5],['lb2'])
+#C = component()
+#CC = C.combine([A,D,E,F])
+#print (C, C.M, C.type)
+#print (CC, CC.M, CC.type)
+
+
+    def set_z(self, zin):
+        if not isinstance(zin, list) or not len(zin)>1 or isinstance(zin[0],int) and not isinstance(zin[0],float):
+            raise Exception ('Sorry, axial position Z must be a list with one number in it')
+
+        self.z = zin
+        return self
 
