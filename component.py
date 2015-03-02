@@ -29,11 +29,15 @@ class component:
 
     # these methods are to construct different types of components
 
-    def __init__ (self, M = None, z = [0]):
+    def __init__ (self, M = np.matrix([[1,0],[0,1]]), Z = 0, label = None):
 
-        self.z = z
+        self.M = M
+        self.z = Z
         self.type = 'other'
         self.parameters = [0]
+        
+        if label is not None:
+            self.label = label
 
 
     @staticmethod
@@ -77,8 +81,7 @@ class component:
             return lenslist 
 
 
-        fl = focalLength[0]
-        M = np.matrix('1, 0; -1/fl, 1')        
+        M = np.matrix([[1,0],[-1/focalLength[0],1]])        
 
         o = component(M, Z)
         o.type = 'lens'
@@ -91,7 +94,7 @@ class component:
 
 
 #Example:
-#A = component.lens([1,3],[4,5],['lb1','lb2'])
+#A = component.lens([2,3],[4,5],['lb1','lb2'])
 #print (A[1].type, A[1].parameters.focalLength, A[1].label)
 
 
@@ -136,8 +139,7 @@ class component:
             return curvedMirrorlist
 
 
-        radii = radiusOfCurvature[0]
-        M = np.matrix('1, 0; -2/radii, 1')        
+        M = np.matrix([[1,0],[-2/radiusOfCurvature[0],1]])        
 
         o = component(M, Z)
         o.type = 'curved mirror'
@@ -155,7 +157,7 @@ class component:
 
 
     @staticmethod
-    def flatMirror (Z = [0], label = None):
+    def flatMirror (Z = 0, label = None):
 
         #   -- component.flatMirror --
         # Create a flat Mirror component object.
@@ -165,7 +167,7 @@ class component:
         # This creates a flat mirror component at position z.
         # Label is a string which is used to identify the component.
 
-        M = np.matrix('1, 0; 0, 1') 
+        M = np.matrix([[1, 0],[0, 1]]) 
         
         o = component(M, Z)
         o.type = 'flat mirror'
@@ -176,5 +178,60 @@ class component:
         return o
  
 #Example:
-#C = component.flatMirror([60],'fm1')
+#C = component.flatMirror(60,'fm1')
 #print (C.type, C.z, C.label)
+
+
+    @staticmethod
+    def dielectric (R1, R2, thickness = 0, n = 1, Z = 0, label = None):
+        # -- component.dielectric --
+        # Create a dielectric component object.
+        # Example:
+        # mylens = component.dielectric(R1, R2, thickness, n, Z, label);
+        # This creates a dielectric (thick lens) component at position
+        # z. label is a string which is used to identify the component.
+        
+        dist = np.matrix([[1, thickness],[0, 1]])
+        refract1 = np.matrix([[1, 0], [(n-1)/R2, n]])
+        refract2 = np.matrix([[1, 0], [(1-n)/(R1*n), 1/n]])
+        M = refract1*dist*refract2 
+
+        o = component(M, Z)
+        o.type = 'dielectric'
+        o.parameters = nprf.rec_append_fields(o.parameters,'length',[thickness],dtypes = [(float)])
+        if label is not None:
+            o.label = label
+        else:
+            o.label = 'no label'
+        return o
+
+#Example:
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#print (D.type, D.parameters.length, D.label)
+
+       
+    @staticmethod
+    def propagator (DZ = 0, Z = 0, label = None):
+
+        # -- component.propagator --
+        # Create a free-space propagator component object.
+        # Example:
+        # mylens = component.propagator(dz,z,label);
+        # This creates a propagator component with length dz at position
+        # z. label is a string which is used to identify the component.
+
+        M = np.matrix([[1, DZ], [0, 1]]) 
+
+        o = component(M, Z)
+        o.type = 'propagator'
+        o.parameters = nprf.rec_append_fields(o.parameters,'length',[DZ],dtypes = [(float)])
+        if label is not None:
+            o.label = label
+        else:
+            o.label = 'no label'
+        return o
+
+#Example:
+E = component.propagator(0.5, 2, 'prop1')
+print (E.type, E.parameters.length, E.label)
+
