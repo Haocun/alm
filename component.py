@@ -274,9 +274,43 @@ class component:
 
 
     def set_z(self, zin):
-        if not isinstance(zin, list) or not len(zin)>1 or isinstance(zin[0],int) and not isinstance(zin[0],float):
+
+        if not isinstance(zin, list)\
+        or not len(zin)>1 \
+        or isinstance(zin[0],int) \
+        and not isinstance(zin[0],float):
             raise Exception ('Sorry, axial position Z must be a list with one number in it')
 
         self.z = zin
         return self
 
+
+    def set_M(self, Min):
+
+        if isinstance(Min, np.matrix) and Min.shape==(2,2):
+            self.M = Min
+
+        else:
+            raise Exception ('Sorry, transformation matrix M must be a 2x2 matrix')
+
+        return self
+
+
+    def set_length(self, L):
+
+        # -- component.setLength --
+        # set the real space length of an object.
+        
+        self.parameters.length = [L]
+
+        return self
+        
+
+##Example:
+#E = component.propagator(0.5, 2, 'prop1')
+#E.set_length(3)
+#print (E.parameters.length)
+#
+#F = component.curvedMirror([10],[40],['cM1'])
+#F.set_length(3)
+#print (F.parameters.ROC, F.parameters.length)
