@@ -237,13 +237,39 @@ class component:
 #print (E.type, E.parameters.length, E.label)
 
 
-#    def duplicate(self):
-#
-#        # -- component.duplicate --
-#        # make a new component (or array of components) with the
-#        # same properties as the original.
-#        # Example:
-#        # lens1copy = lens1.duplicate;
+    def duplicate(self,objin):
+
+        # -- component.duplicate --
+        # make a new component (or array of components) with the
+        # same properties as the original.
+        # Example:
+        # lens1copy = lens1.duplicate;
+
+        componentlist = []
+        (nn,mm) = np.shape(objin)
+        if np.prod([nn,mm]) > 0:
+            for ii in range(nn):
+                for jj in range(mm):
+                    copyc = component(objin[ii][jj].M,objin[ii][jj].z,objin[ii][jj].label);
+                    copyc.type = objin[ii][jj].type;
+                    copyc.parameters = objin[ii][jj].parameters;
+                    componentlist.append(copyc)
+        else:
+            pass
+
+        return componentlist
+#question:
+#meaning of product > 0
+#what happens when < 0
+
+##Example:
+#A = component.lens([2],[0.2],['lb1'])
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#E = component.propagator(0.5, 2, 'prop1')
+#F = component.lens([3],[5],['lb2'])
+#M = component()
+#N = M.duplicate([[A,D],[E,F]])
+#print (N[0], N[1].type, N[2].parameters)
 
 
     def combine(self, componentTrain):
@@ -314,3 +340,21 @@ class component:
 #F = component.curvedMirror([10],[40],['cM1'])
 #F.set_length(3)
 #print (F.parameters.ROC, F.parameters.length)
+
+
+    def display(self):
+        topRow = ['label','z (m)','type']
+        lineBreak = ['-----','-----','-----']
+        parameterColumn(len(self)+2,1) = []
+        parameterColumn.append('parameters')
+        parameterColumn.append('----------')
+
+        output = [topRow;lineBreak;[self.label, self.z, self.type]]
+        output = [output,parameterColumn]
+
+        print(' ')
+        print() 
+        print(' ')
+        print(outstring)
+        print(' ')
+
