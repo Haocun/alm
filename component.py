@@ -1,7 +1,8 @@
 import numpy as np
 import numpy.lib.recfunctions as nprf
+from copy import deepcopy
 
-class component:
+class component(object):
     
     """
     -- component --
@@ -237,67 +238,7 @@ class component:
 #print (E.type, E.parameters.length, E.label)
 
 
-    def duplicate(self,objin):
-
-        # -- component.duplicate --
-        # make a new component (or array of components) with the
-        # same properties as the original.
-        # Example:
-        # lens1copy = lens1.duplicate;
-
-        componentlist = []
-        (nn,mm) = np.shape(objin)
-        if np.prod([nn,mm]) > 0:
-            for ii in range(nn):
-                for jj in range(mm):
-                    copyc = component(objin[ii][jj].M,objin[ii][jj].z,objin[ii][jj].label);
-                    copyc.type = objin[ii][jj].type;
-                    copyc.parameters = objin[ii][jj].parameters;
-                    componentlist.append(copyc)
-        else:
-            pass
-
-        return componentlist
-#question:
-#meaning of product > 0
-#what happens when < 0
-
-##Example:
-#A = component.lens([2],[0.2],['lb1'])
-#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
-#E = component.propagator(0.5, 2, 'prop1')
-#F = component.lens([3],[5],['lb2'])
-#M = component()
-#N = M.duplicate([[A,D],[E,F]])
-#print (N[0], N[1].type, N[2].parameters)
-
-
-    def combine(self, componentTrain):
-
-        # -- component.combine --
-        # Squashes a list of components together to make a single component
-        # with transfer matrix equal to the product of the list, multiplied
-        # in order of index array.
-
-        Mtrain = np.matrix([[1,0],[0,1]])
-
-        for j in range(len(componentTrain)):
-            Mtrain = componentTrain[j].M * Mtrain
-        
-        cT = component(Mtrain, 0)
-        cT.type = 'composite'
-        return cT
-
-#Example:
-#A = component.lens([2],[0.2],['lb1'])
-#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
-#E = component.propagator(0.5, 2, 'prop1')
-#F = component.lens([3],[5],['lb2'])
-#C = component()
-#CC = C.combine([A,D,E,F])
-#print (C, C.M, C.type)
-#print (CC, CC.M, CC.type)
-
+# Methods for setting the values of properties.
 
     def set_z(self, zin):
 
@@ -342,19 +283,84 @@ class component:
 #print (F.parameters.ROC, F.parameters.length)
 
 
+
+# Methods for a list of components. 
+class componentList(list):
+
+    def duplicate(self):
+
+        # -- component.duplicate --
+        # make a new component (or array of components) with the
+        # same properties as the original.
+        # automatically return an empty list if the input is an empty list
+
+        return deepcopy(self)
+
+
+##Example:
+#A = component.lens([2],[0.2],['lb1'])
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#E = component.propagator(0.5, 2, 'prop1')
+#F = component.lens([3],[5],['lb2'])
+#M = componentList([[A,D],[E,F]])
+#N = M.duplicate()
+#print (N, np.shape(N), N[1][0].type, N[0][1].parameters)
+#M2 = componentList([])
+#N2 = M2.duplicate()
+#print N2
+
+
+    def combine(self):
+
+        # -- component.combine --
+        # Squashes a list of components together to make a single component
+        # with transfer matrix equal to the product of the list, multiplied
+        # in order of index array.
+
+        Mtrain = np.matrix([[1,0],[0,1]])
+
+        for j in range(len(self)):
+            Mtrain = self[j].M * Mtrain
+        
+        cT = component(Mtrain, 0)
+        cT.type = 'composite'
+        return cT
+
+#Example:
+#A = component.lens([2],[0.2],['lb1'])
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#E = component.propagator(0.5, 2, 'prop1')
+#F = component.lens([3],[5],['lb2'])
+#C = componentList([A,D,E,F])
+#CC = C.combine()
+#print (CC, CC.M, CC.type)
+
+
     def display(self):
-        topRow = ['label','z (m)','type']
-        lineBreak = ['-----','-----','-----']
-        parameterColumn(len(self)+2,1) = []
-        parameterColumn.append('parameters')
-        parameterColumn.append('----------')
 
-        output = [topRow;lineBreak;[self.label, self.z, self.type]]
-        output = [output,parameterColumn]
+        topRow = ['label','z (m)','type','parameters']
+        lineBreak = ['-----','-----','-----','----------']
+        
+        
+        labelList = []
+        zList = []
+        typeList = []
+        parameterList = []
+        
+        for j in range(len(self)):
+            labelList.append(self[j].label)
+            zList.append(str(self[j].z))
+            typeList.append(self[j].type)
+            parameterList.append(self[j].parameters)
 
-        print(' ')
-        print() 
-        print(' ')
-        print(outstring)
-        print(' ')
+        output = [topRow,lineBreak,np.transpose([labelList, zList, typeList,parameterList])]
 
+        print()
+
+#Example:
+A = component.lens([2],[0.2],['lb1'])
+D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+E = component.propagator(0.5, 2, 'prop1')
+F = component.lens([3],[5],['lb2'])
+C = componentList([A,D,E,F])
+C.display()
