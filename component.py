@@ -82,7 +82,7 @@ class component(object):
             return lenslist 
 
         
-        fl = -1/focalLength[0]
+        fl = -1./focalLength[0]
         M = np.matrix([[1,0],[fl,1]])        
 
         o = component(M, Z)
@@ -141,7 +141,7 @@ class component(object):
             return curvedMirrorlist
 
         radii = radiusOfCurvature[0]
-        M = np.matrix([[1,0],[-2/radii,1]])        
+        M = np.matrix([[1,0],[-2./radii,1]])        
 
         o = component(M, Z)
         o.type = 'curved mirror'
@@ -195,7 +195,7 @@ class component(object):
         
         dist = np.matrix([[1, thickness],[0, 1]])
         refract1 = np.matrix([[1, 0], [(n-1)/R2, n]])
-        refract2 = np.matrix([[1, 0], [(1-n)/(R1*n), 1/n]])
+        refract2 = np.matrix([[1, 0], [(1-n)/(R1*n), 1./n]])
         M = refract1*dist*refract2 
 
         o = component(M, Z)
@@ -337,30 +337,37 @@ class componentList(list):
 
 
     def display(self):
+        
+        print (' label  '+'  z(m)  '+'  type  '+'  parameters')
+        print (' ----- '+'  ------ '+'  ----- '+'  ----------')
 
-        topRow = ['label','z (m)','type','parameters']
-        lineBreak = ['-----','-----','-----','----------']
-        
-        
         labelList = []
         zList = []
         typeList = []
         parameterList = []
         
         for j in range(len(self)):
+            
             labelList.append(self[j].label)
-            zList.append(str(self[j].z))
             typeList.append(self[j].type)
-            parameterList.append(self[j].parameters)
+            
+            if isinstance(self[j].z,list):
+                zList.append(self[j].z[0])
+            else:
+                zList.append(self[j].z)
+            
+            pname = self[j].parameters.dtype.names[1]
+            pvalue = self[j].parameters[pname][0]
+            parameterList.append(pname+' = '+str(pvalue)+' m')
+        
+        comps = np.transpose([labelList, zList, typeList, parameterList])
+        for i in range(len(comps)):
+            print comps[i]
 
-        output = [topRow,lineBreak,np.transpose([labelList, zList, typeList,parameterList])]
-
-        print()
-
-#Example:
-A = component.lens([2],[0.2],['lb1'])
-D = component.dielectric(1,2,0.1,1.3,5,'fm1')
-E = component.propagator(0.5, 2, 'prop1')
-F = component.lens([3],[5],['lb2'])
-C = componentList([A,D,E,F])
-C.display()
+##Example:
+#A = component.lens([3],[0.2],['lb1'])
+#D = component.dielectric(1,2,0.1,1.3,5,'fm1')
+#E = component.propagator(0.5, 2, 'prop1')
+#F = component.lens([3],[5],['lb2'])
+#C = componentList([A,D,E,F])
+#C.display()
