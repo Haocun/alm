@@ -362,7 +362,7 @@ class componentList(list):
         
         comps = np.transpose([labelList, zList, typeList, parameterList])
         for i in range(len(comps)):
-            print comps[i]
+            print comps[i] #.tostring()
 
 ##Example:
 #A = component.lens([3],[0.2],['lb1'])
