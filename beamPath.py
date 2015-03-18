@@ -2,10 +2,10 @@ import numpy as np
 
 class beamPath(object):
 
-	"""
-	-- beamPath --
+    """
+    -- beamPath --
 
-    	A beam path object consists of a few things:
+    A beam path object consists of a few things:
     
         * A seed beam. This defines the "input beam" of your system.
                 When calculating the beam properties somewhere in a beam
@@ -39,3 +39,81 @@ class beamPath(object):
     	The beamPath class also has methods which facilitate in calculating 
         beam propagation and laying out your beam path.
     """
+
+
+#    def __init__ (self, seedq, seedz, targetq, tqrgetz):
+#
+#        self.seedq = beamq
+#        self.seedz = []
+#        self.targetq = beamq
+#        self.targetz = []
+#            
+#        self.components_raw = component;            
+#        self.components_raw[1]=[];
+#
+#
+#    def __lossFuc (self, zVec, *args):
+#        path2 = self.duplicate
+#        path2.__batchMove(zVec)
+#
+#        losses = 1-path2self.targetOverlap
+#        del(path2)
+#
+#        return losses
+#
+#
+#
+#    def __applyCostFunc (self, costFunc, zVec, *args):
+#        path2 = self.duplicate
+#        path2.__batchMove(zVec)
+#
+#        cost = costFunc(path2)
+#        del(path2)
+#
+#        return losses
+#
+#
+#
+#    def __batchmove(self, moveVec):
+#
+#        comps = self.components
+#
+#        compCount = len(comps)
+#        moveCount = len(moveVec)
+#
+#        if moveCount > compCount:
+#            self.targetz = moveVec(compCount+1)
+#
+#        for j in rang(len(compCount)):
+#            if comps[j].z == moveVec(j):
+#                pass
+#            comps[j].z = moveVec(j)
+#
+#
+#
+#    def __sortComponents(self):
+#
+#        complist = [self.components_raw]
+#
+#        zlist = [complist.z]
+#        [zsorted,zindex] = zlist.sort
+#
+#        # if len(complist) < 1 or all(complist == complist(zindex))
+#        #         return
+#        
+#        self.components = complist[zindex]
+#
+#
+#
+#    def __beamFitError(self, waistParams, zPred, widthPred, wavelength):
+#
+#        pathdup = self.duplicate
+#        pathdup.seedq = beamq.beamWaistAndZ(waistParams[1], waistParams[2], wavelength)
+#        qout = pathdup.qPropagate(zPred);
+#
+#        widthPred = reshape(widthPred,1,numel(widthPred))
+#
+#        width = [qout.beamWidth]
+#            
+#        error = sum((widthPred-width)**2)
+
