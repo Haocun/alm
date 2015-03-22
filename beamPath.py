@@ -280,7 +280,22 @@ class beamPath(object):
         #     so this method allows one to access the desired component
         #     unambiguously.
 
-        
+        componentIndex = self.findComponentIndex(componentLabel)
+            
+        return self.components(componentIndex)
+
+
+
+    def findComponentIndex(self, componentLabel):
+
+        #  -- beamPath.findComponentIndex --
+        #
+        #     Returns the index of a component in the component list
+        #     Example:
+        #     Suppose 'goodlens' is the fourth component in the component list 
+        #     of beampath path1.
+        #     path1.findComponentIndex('goodlens')
+        #     This statement would return the number 4.
 
 
 
