@@ -1,4 +1,7 @@
 import numpy as np
+import beamq
+import component
+from copy import deepcopy
 
 class beamPath(object):
 
@@ -41,16 +44,18 @@ class beamPath(object):
     """
 
 
-#    def __init__ (self, seedq, seedz, targetq, tqrgetz):
-#
-#        self.seedq = beamq
-#        self.seedz = []
-#        self.targetq = beamq
-#        self.targetz = []
-#            
-#        self.components_raw = component;            
-#        self.components_raw[1]=[];
-#
+    def __init__ (self, seedq, seedz, targetq, targetz):
+
+        self.seedq = beamq
+        self.seedz = []
+        self.targetq = beamq
+        self.targetz = []
+            
+        self.components_raw = component            
+        #self.components_raw[1]=[]  #empty the component list
+
+
+
 #
 #    def __lossFuc (self, zVec, *args):
 #        path2 = self.duplicate
@@ -116,4 +121,187 @@ class beamPath(object):
 #        width = [qout.beamWidth]
 #            
 #        error = sum((widthPred-width)**2)
+
+
+
+    def duplicate(self):
+
+        # -- beamPath.duplicate --
+        #
+        #    Creates a new beampath with the same properties as the original.
+        #    Example:
+        #    path1copy = path1.duplicate
+
+        return deepcopy(self) #beamPath(self.seedq.duplicate, self.seedz, self.targetq.duplicate, self.targetz)
+
+
+
+    def branchPath(self, zlink):
+
+        # -- beamPath.branchPath --
+        #
+        #    create a new beamPath object which is identical to the calling object,
+        #    but has a seed beam which is calculated from the seed beam in the first
+        #    object but located in another place.
+        # 
+        #    this can be useful when you want to make a new path which has the same
+        #    beam as the original path at a given location, and then allows you to 
+        #    alter the componentsin the new path without changing the beam at the 
+        #    location you chose.
+        #
+        #    syntax: path2 = path1.branchPath(zlink)
+        #    zlink is the position of the beam you would like to be the seed beam of 
+        #    the new path.
+
+        qlink = self.qPropagate(zlink)
+        self = self.duplicate()
+
+        self.seedq = qlink
+        self.seedz = zlink
+
+
+
+    def set_components(self, comps):
+
+        self.components_raw = comps
+
+        return self
+
+
+    @property
+    def components(self):
+
+        self.sortComponents
+        return self.components_raw
+
+
+
+#    def display(self):
+
+
+
+
+
+
+
+
+
+
+    def addComponent(self, newComponent):
+        
+        # -- beamPath.addComponent --
+        #
+        #    add a component object to a beampath.
+        #    Example:
+        #    mylens = component.lens(2,0,'mylens')
+        #    path1.addComponent(mylens)
+
+        self.components = self.components.append(newComponent)
+
+
+
+    def deleteComponent(self, delLabel):
+
+        # -- beamPath.deleteComponent --
+        #   
+        #    remove a component object from a beampath
+        #    Example:
+        #    path1.deleteComponent('mylens');
+            
+        delIndex = self.findComponentIndex(delLabel)
+        del self.components[delIndex-1]
+            
+        return self.components
+
+
+
+    def moveComponent(self, componentLabel, displacement, isabsolute = ''):
+
+        # -- beamPath.moveComponent --
+        #   
+        #    Change the z parameter of a component in a beam path by a given displacement.
+        #    Example:
+        #    path1.moveComponent('lens1',0.5)
+        #    This will move 'lens1' 0.5m in the positive z direction.
+        #    To move a component to an absolute position use the extra argument 'absolute.'
+        #    Example:
+        #    path1.moveComponent('lens1',2.5,'absolute')
+        #    This will move 'lens1' to the position z = 2.5m
+
+        componentIndex = self.findComponentIndex(componentLabel)
+            
+        componentToMove = self.components(componentIndex)
+        zstart = componentToMove.z
+
+        if isabsolute == 'absolute':
+            displacement = displacement - zstart
+
+        componentToMove.z = zstart + displacement
+
+
+
+    def replaceCompnent(self, componentLabel, newComponent):
+
+        # -- beamPath.replaceComponent --
+        #
+        #    Remove a component and replace it with another, the new component inherits the
+        #    z position and label of the previous component being removed.
+        #    Example:
+        #    newlens = component.lens(1)
+        #    path1.replaceComponent('lens1',newlens)
+        #    This removes the old 'lens1' component and adds the new component at the 
+        #    position where 'lens1' was. The name 'lens1' is inherited by the new component.
+
+        componentIndex = self.findComponentIndex(componentLabel)
+            
+        newComponent.z = self.components(componentIndex).z
+        newComponent.label = self.components(componentIndex).label            
+        self.deleteComponent(componentIndex)
+        self.addComponent(newComponent)
+
+
+
+    def component(self, componentLabel):
+
+        #  -- beamPath.component --
+        #
+        #     Allows access to component in a beam path by use of the component label.
+        #     Example:
+        #     To find out the z position of 'mylens' which might be the 
+        #     third lens in the component list, one could either do:
+        #    
+        #     path1.components(3).z
+        #     or
+        #     path1.component('mylens').z  %%% <-- notice the use of the 
+        #                                      singular word 'component' in this case
+        #     which would yield the same result.
+        #     However, the component index may change if new components are 
+        #     added, the indexing is always in order of increasing z position,
+        #     so this method allows one to access the desired component
+        #     unambiguously.
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a = beamPath(0,0,0,0)
+b = a.duplicate()
+print (a, b)
+print ('  next  ')
+print (a.seedq, a.seedz, a.targetq, a.components_raw)
+
+
 
